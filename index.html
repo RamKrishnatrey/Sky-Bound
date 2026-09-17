@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#121c38">
+  <title>Skybound — A Small Platforming Adventure</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="masthead">
+      <a class="brand" href="#" id="title-home" aria-label="Return to Skybound title screen">
+        <span class="brand-mark" aria-hidden="true">✦</span>
+        <span>Skybound</span>
+      </a>
+      <div class="header-actions">
+        <button class="icon-button" type="button" id="sound-toggle" aria-pressed="false" aria-label="Sound is on. Mute sound">
+          <span aria-hidden="true">♪</span><span class="button-label">Sound</span>
+        </button>
+        <button class="icon-button" type="button" id="settings-button" aria-haspopup="dialog" aria-controls="settings-modal">
+          <span aria-hidden="true">⚙</span><span class="button-label">Settings</span>
+        </button>
+      </div>
+    </header>
+
+    <section class="game-stage" aria-label="Skybound game area">
+      <div class="hud" aria-label="Game status">
+        <div class="hud-item"><span class="hud-label">Stage</span><strong id="hud-stage">—</strong></div>
+        <div class="hud-item"><span class="hud-label">Score</span><strong id="hud-score">0</strong></div>
+        <div class="hud-item"><span class="hud-label">Stars</span><strong id="hud-stars">0 / 0</strong></div>
+        <div class="hud-item"><span class="hud-label">Lives</span><strong id="hud-lives">● ● ●</strong></div>
+        <div class="hud-item"><span class="hud-label">Time</span><strong id="hud-time">0:00.0</strong></div>
+        <div class="hud-item best"><span class="hud-label">Best</span><strong id="hud-best">0</strong></div>
+        <button class="pause-button" type="button" id="pause-button" aria-label="Pause game">Ⅱ <span>Pause</span></button>
+      </div>
+
+      <div class="canvas-frame">
+        <canvas id="game-canvas" width="1280" height="720" tabindex="0" role="img" aria-label="Skybound platforming playfield. Use Left and Right or A and D to move; Space, W, or Up Arrow to jump."></canvas>
+        <div class="canvas-vignette" aria-hidden="true"></div>
+      </div>
+
+      <div class="touch-controls" aria-label="Touch controls">
+        <div class="touch-cluster" aria-label="Movement controls">
+          <button class="touch-button" type="button" data-control="left" aria-label="Move left">←</button>
+          <button class="touch-button" type="button" data-control="right" aria-label="Move right">→</button>
+        </div>
+        <button class="touch-button jump-button" type="button" data-control="jump" aria-label="Jump">↑<span>Jump</span></button>
+      </div>
+    </section>
+
+    <p id="live-status" class="sr-only" aria-live="polite" aria-atomic="true"></p>
+  </main>
+
+  <div class="modal-layer" id="modal-layer" aria-live="polite">
+    <section class="modal panel title-panel is-active" id="title-modal" role="dialog" aria-modal="true" aria-labelledby="title-heading">
+      <p class="eyebrow">A small platforming adventure</p>
+      <h1 id="title-heading">Skybound</h1>
+      <p class="hero-copy">Cross five floating ruins, gather starlight, and find your way home.</p>
+      <div class="stat-ribbon" aria-label="Your best result">
+        <span>Personal best</span><strong id="title-best">0</strong>
+        <span id="title-best-detail">No completed runs yet</span>
+      </div>
+      <div class="modal-actions">
+        <button class="button button-primary" type="button" id="start-button">Begin adventure <span aria-hidden="true">→</span></button>
+        <button class="button button-quiet" type="button" id="instructions-button">How to play</button>
+      </div>
+      <p class="key-hint"><kbd>←</kbd><kbd>→</kbd> move · <kbd>Space</kbd> jump · <kbd>P</kbd> pause</p>
+    </section>
+
+    <section class="modal panel info-panel" id="instructions-modal" role="dialog" aria-modal="true" aria-labelledby="instructions-heading" hidden>
+      <p class="eyebrow">Controls & objective</p>
+      <h2 id="instructions-heading">Find the star portal</h2>
+      <div class="instructions-grid">
+        <div><span class="instruction-icon" aria-hidden="true">← →</span><strong>Move</strong><p>Arrow keys or <kbd>A</kbd> / <kbd>D</kbd></p></div>
+        <div><span class="instruction-icon" aria-hidden="true">↥</span><strong>Jump</strong><p><kbd>Space</kbd>, <kbd>W</kbd>, or <kbd>↑</kbd></p></div>
+        <div><span class="instruction-icon" aria-hidden="true">✦</span><strong>Explore</strong><p>Collect stars for score and reach every portal.</p></div>
+        <div><span class="instruction-icon" aria-hidden="true">Ⅱ</span><strong>Pause</strong><p>Press <kbd>P</kbd> or <kbd>Esc</kbd> whenever you need a break.</p></div>
+      </div>
+      <p class="callout">A short tap gives a small jump; hold the button for more height. Falling or touching hazards costs a life, but checkpoints keep your progress.</p>
+      <div class="modal-actions"><button class="button button-primary" type="button" data-close="instructions-modal">Ready</button></div>
+    </section>
+
+    <section class="modal panel pause-panel" id="pause-modal" role="dialog" aria-modal="true" aria-labelledby="pause-heading" hidden>
+      <p class="eyebrow">Take a breath</p><h2 id="pause-heading">Paused</h2>
+      <p>Your journey is waiting exactly where you left it.</p>
+      <div class="modal-actions">
+        <button class="button button-primary" type="button" id="resume-button">Resume <span aria-hidden="true">→</span></button>
+        <button class="button button-quiet" type="button" id="restart-level-button">Restart stage</button>
+        <button class="button button-quiet" type="button" id="pause-title-button">Return to title</button>
+      </div>
+    </section>
+
+    <section class="modal panel result-panel" id="level-complete-modal" role="dialog" aria-modal="true" aria-labelledby="level-complete-heading" hidden>
+      <p class="eyebrow">Portal found</p><h2 id="level-complete-heading">Stage complete!</h2>
+      <div class="result-score"><span>Score</span><strong id="level-score">0</strong></div>
+      <dl class="result-breakdown"><div><dt>Stars found</dt><dd id="level-stars">0 / 0</dd></div><div><dt>Time bonus</dt><dd id="level-time-bonus">+0</dd></div><div><dt>Lives remaining</dt><dd id="level-lives-bonus">+0</dd></div></dl>
+      <p id="next-level-copy">The next floating ruin is calling.</p>
+      <div class="modal-actions"><button class="button button-primary" type="button" id="next-level-button">Continue <span aria-hidden="true">→</span></button></div>
+    </section>
+
+    <section class="modal panel result-panel" id="game-over-modal" role="dialog" aria-modal="true" aria-labelledby="game-over-heading" hidden>
+      <p class="eyebrow">The clouds caught you</p><h2 id="game-over-heading">Adventure paused</h2>
+      <p>You made it to <strong id="game-over-stage">stage 1</strong> with <strong id="game-over-score">0</strong> points.</p>
+      <div class="modal-actions">
+        <button class="button button-primary" type="button" id="retry-button">Try again <span aria-hidden="true">↻</span></button>
+        <button class="button button-quiet" type="button" id="game-over-title-button">Return to title</button>
+      </div>
+    </section>
+
+    <section class="modal panel victory-panel" id="victory-modal" role="dialog" aria-modal="true" aria-labelledby="victory-heading" hidden>
+      <p class="eyebrow">All five ruins restored</p><h2 id="victory-heading">You are skybound.</h2>
+      <p class="hero-copy">The starlight has led you all the way home.</p>
+      <div class="victory-stats"><div><span>Final score</span><strong id="victory-score">0</strong></div><div><span>Stars found</span><strong id="victory-stars">0 / 0</strong></div><div><span>Journey time</span><strong id="victory-time">0:00.0</strong></div></div>
+      <p id="new-best-message" class="new-best" hidden>New personal best!</p>
+      <div class="modal-actions"><button class="button button-primary" type="button" id="play-again-button">Play again <span aria-hidden="true">↻</span></button><button class="button button-quiet" type="button" id="victory-title-button">Return to title</button></div>
+    </section>
+
+    <section class="modal panel settings-panel" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-heading" hidden>
+      <p class="eyebrow">Make it yours</p><h2 id="settings-heading">Settings</h2>
+      <label class="toggle-row"><span><strong>Sound effects</strong><small>Simple, optional synthesized sounds</small></span><input id="sound-setting" type="checkbox" checked><span class="toggle-ui" aria-hidden="true"></span></label>
+      <label class="toggle-row"><span><strong>Reduced effects</strong><small>Limit particles, motion, and screen shake</small></span><input id="effects-setting" type="checkbox"><span class="toggle-ui" aria-hidden="true"></span></label>
+      <div class="modal-actions"><button class="button button-primary" type="button" data-close="settings-modal">Done</button></div>
+    </section>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
